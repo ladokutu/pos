@@ -3,41 +3,34 @@ import { DataGrid,GridToolbar  } from '@mui/x-data-grid';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import {TextField} from '@mui/material';
 import { MoreVert ,Delete,Edit } from '@mui/icons-material';
-import IconButton from '@mui/material/IconButton';
-import LinearProgress from '@mui/material/LinearProgress';
-import {Dialog,DialogActions,DialogTitle,DialogContent,Grid,Menu,MenuItem,Divider,ListItemIcon} from '@mui/material';
+import {LinearProgress} from '@mui/material';
+import {Dialog,DialogActions,DialogTitle,DialogContent,Grid,Menu,MenuItem,IconButton,ListItemIcon,Divider,TextField} from '@mui/material';
 import Slide from '@mui/material/Slide';
-import { useNavigate  } from 'react-router-dom'
-import Loader from '../Tools/Loader';
-import Alerts from '../Tools/Alerts';
+import Loader from '../../Tools/Loader';
+import Alerts from '../../Tools/Alerts';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-export default function Workplace() {
+
+
+export default function CategoryItems() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false)
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
   const [openedit, setOpenedit] = useState(false)
-  const [pageSize, setPageSize] = React.useState(5);
-   const navigate = useNavigate();
-  
+  const [pageSize, setPageSize] = useState(10);
   const [value, setValue] = useState('');
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const openbol = Boolean(anchorEl);
   const [alerto, setAlerto] = useState('');
   const [detail, setDetail] = useState('');
   
-  useEffect(() => {
-		GetData()
-    },[]); 
-	
   const columns = [
 	  { field: 'nomor', headerName: 'No', width: 50 },
-	  { field: 'workplace', headerName: 'Workplace Name', width: 450 },
-	  { field: 'address', headerName: 'Address', width: 450 },
+	  { field: 'id_type', headerName: 'Code', width: 200 },
+	  { field: 'category_name', headerName: 'Type', width: 550 },
 	  { field: 'id', headerName: 'Action', width: 100,
 			renderCell: (cellValues) => {
 			  return (
@@ -58,15 +51,13 @@ export default function Workplace() {
 							  'aria-labelledby': 'basic-button',
 							}}
 					>
-						<MenuItem onClick={()=> navigate("/ms/workplace_location",{state: {id: value}} 
-						  )}>Location</MenuItem>
 						<Divider/>
 						<MenuItem onClick={()=> view_edit_data(value)}>
 							<ListItemIcon>
 								<Edit fontSize="small" color="warning" />
 							</ListItemIcon>Edit
 						</MenuItem>
-						<MenuItem onClick={()=> deleteselected([value])}>
+						<MenuItem onClick={()=> deleteselected(value)}>
 							<ListItemIcon>
 								<Delete fontSize="small" color="error" />
 							</ListItemIcon>Delete
@@ -78,14 +69,14 @@ export default function Workplace() {
 	  },
 	];
 	const handleClick = (event, cellValues) => {
-	  //console.log(cellValues.row.id_work);
-	  setValue(cellValues.row.id_work)
+	  //console.log(cellValues.row.id);
+	  setValue(cellValues.row.id)
 	  setAnchorEl(event.currentTarget);
 	};
-	const handleCloseAlerto = () => {
-		setAlerto(false);
-	  };
-  
+	
+	useEffect(() => {
+		GetData()
+    },[]); 
 	const GetData = async () => {
 		try {
 			setLoading(true)
@@ -93,13 +84,14 @@ export default function Workplace() {
 			const headers_data = {
 				Authorization: tokendata,
 			}
-			var api='https://panen.ladokutu.info/index.php/Solution/data_master_workplace';  
+			var api='https://node.ladokutu.info/index.php/Posc/master_category_item_merchant_pos';  
 			const response = await axios({
 				method: 'post',
 				headers: headers_data,
 				url: api,
+				//withCredentials: true,
 			});
-			
+			//console.log(response)
 			setData(response.data)
 			setLoading(false)
 		} catch (e) {
@@ -107,27 +99,21 @@ export default function Workplace() {
 		}
 	}
 	const SimpanData = async (event) => {
-		
+		setLoading(true)
+		setOpen(false)
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		let workplace = data.get('workplace')
-		let address = data.get('address')
-		/*console.log({
-		  full_name: full_name,
-		  born_place: born_place,
-		});
-		*/
-		setOpen(false)
-		setLoading(true)
+		let category_name = data.get('category_name')
+
+
 		try { 
 			const tokendata = await localStorage.getItem('TokenData')
 				const headers_data = {
 					Authorization: tokendata,
 				}
-            var api='https://panen.ladokutu.info/index.php/Solution/add_data_master_workplace';  
+            var api='https://node.ladokutu.info/index.php/Posc/add_data_master_category_item_merchant_pos';  
             const data_body = { 
-                    'workplace': workplace,
-					'address': address,
+                    'category_name': category_name
                 }
 			const response = await axios({
                   method: 'post',
@@ -135,26 +121,29 @@ export default function Workplace() {
 				  headers: headers_data,
                   data: data_body
 				});
-			//console.log(response.data)
-			if (response.data.status === 200 ){
+			if(response.data.status===200){
 				GetData()
 			}
-				//event.current.reset()
 				setAlerto({
 				  alerto: true,
 				  state_msg: response.data.message,
 				  state_typ:'success'
 				});
+				console.log(response.data.message)
+			
 			setLoading(false)
         } catch (error) {
+			
 			setAlerto({
 				  alerto: true,
 				  state_msg: 'Data Error',
 				  state_typ:'error'
 				});
-			setLoading(false)
             console.log(error)
+			setLoading(false)
         }
+	
+	
   };
   const deleteselected = async (selectedid) => {
 			setAnchorEl(null)
@@ -164,27 +153,32 @@ export default function Workplace() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-				var api='https://panen.ladokutu.info/index.php/Solution/delete_data_master_workplace';  
+				var api='https://node.ladokutu.info/index.php/Solution/delete_data_master_category_item_merchant_pos';  
 				const response = await axios({
 					method: 'post',
 					headers: headers_data,
 					url: api,
 					data: selectedid 
 				});
-				GetData()
+				
+				if(response.data.status===200){
+					GetData()
+				}
+				
+				//console.log(selectedid)
+				setLoading(false)
 				setAlerto({
 				  alerto: true,
 				  state_msg: response.data.message,
 				  state_typ:'success'
 				});
-				//console.log(selectedid)
-				setLoading(false)
 			} catch (e) {
 				setAlerto({
 				  alerto: true,
 				  state_msg: 'Data Error',
 				  state_typ:'error'
 				});
+				console.log(e)
 				setLoading(false)
 			}
 	};
@@ -196,7 +190,7 @@ export default function Workplace() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-				var api='https://panen.ladokutu.info/index.php/Solution/view_data_master_workplace';  
+				var api='https://panen.ladokutu.info/index.php/Solution/view_data_master_category_item_merchant_pos';  
 				const response = await axios({
 					method: 'post',
 					headers: headers_data,
@@ -216,8 +210,9 @@ export default function Workplace() {
 	const EditData = async (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		let workplace = data.get('workplace')
-		let address = data.get('address')
+		let id_depart = data.get('id_depart')
+		let department = data.get('department')
+		
 		setOpenedit(false)
 		setLoading(true)
 		try { 
@@ -225,11 +220,11 @@ export default function Workplace() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-            var api='https://panen.ladokutu.info/index.php/Solution/edit_data_master_workplace';  
+            var api='https://panen.ladokutu.info/index.php/Solution/edit_data_master_category_item_merchant_pos';  
 			const data_body = { 
 					'id': value,
-                    'workplace': workplace,
-					'address': address,
+                    'id_depart': id_depart,
+					'department': department,
                 }
 			const response = await axios({
                   method: 'post',
@@ -261,88 +256,93 @@ export default function Workplace() {
 			setLoading(false)
         }
 
-	};
+  };
+	const handleCloseAlerto = () => {
+		setAlerto(false);
+	  };
+	
+	
   return (
-	<>
+    <>
 	<Loader loading={loading} />
 	<Alerts  alerto={alerto.alerto} state_typ={alerto.state_typ} state_msg={alerto.state_msg} onClose={handleCloseAlerto} />
-		<div style={{ height: 500, width: '100%' }}>
-		  <Box sx={{ '& button': { m: 1 } }}>
-			  <div>
-				<Button variant="outlined" onClick={()=> setOpen(true)}>Add Data</Button>
-			  </div>
-		  </Box>
-		  <DataGrid
-			loading={loading}
-			rows={data}
-			columns={columns}
-			components={{
-			  Toolbar: GridToolbar,
-			  LoadingOverlay: LinearProgress,
-			}}
-			pageSize={pageSize}
-			onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-			rowsPerPageOptions={[5, 10, 20]}
-		  />
-		</div> 
+	<div style={{ height: 500, width: '100%' }}>
+	  <Box sx={{ '& button': { m: 1 } }}>
+		  <div>
+			<Button variant="outlined" onClick={()=> setOpen(true)}>Add Data</Button>
+		  </div>
+	  </Box>
+      <DataGrid
+	    loading={loading}
+        rows={data}
+        columns={columns}
+        components={{
+          Toolbar: GridToolbar,
+		  LoadingOverlay: LinearProgress,
+        }}
+		pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rowsPerPageOptions={[5, 10, 20]}
+      />
+	</div>  
 	  
-		  <Dialog
-			open={open}
-			onClose={()=> setOpen(false)}
-			TransitionComponent={Transition}
-			 maxWidth='md'
-			aria-describedby="alert-dialog-slide-description"
-		  >
-			<DialogTitle>Add Data</DialogTitle>
-			<Box component="form" onSubmit={SimpanData} noValidate sx={{ mt: 1 }}>
-			<DialogContent dividers>
-					
-				<Grid container spacing={1}>
-				  
-				  <Grid item xs={12}>
-					<TextField margin="normal" required fullWidth size="small" name="workplace" id="workplace" label="Workplace Name" autoComplete="workplace" />
-				  </Grid>
-				  <Grid item xs={12}>
-					<TextField margin="normal" required fullWidth size="small" name="address" id="address" label="Address" autoComplete="address" />
-				  </Grid>
-				</Grid>
+	  <Dialog
+        open={open}
+		onClose={()=> setOpen(false)}
+        TransitionComponent={Transition}
+        maxWidth="sm"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle >Add Data</DialogTitle>
+		<Box component="form" onSubmit={SimpanData}  >
+        <DialogContent dividers>
 				
-			</DialogContent>
-			<DialogActions>
-				<Button variant="outlined" onClick={()=> setOpen(false)}>Close</Button>
-				<Button color="success" variant="contained" type="submit">Save</Button>
-			</DialogActions>
-			</Box>
-		  </Dialog>
-		  <Dialog
-			open={openedit}
-			onClose={()=> setOpenedit(false)}
-			TransitionComponent={Transition}
-			 maxWidth='md'
-			aria-describedby="alert-dialog-slide-description"
-		  >
-			<DialogTitle>Add Data</DialogTitle>
-			<Box component="form" onSubmit={EditData} noValidate sx={{ mt: 1 }}>
+			
+			 <Grid container spacing={2} >
+			  
+			  <Grid item xm={12} md={12}>
+				<TextField margin="dense" required fullWidth size="small" name="category_name" id="category_name" label="Category Name" autoComplete="category" autoFocus/>
+			  </Grid>
+			</Grid>
+			
+			
+        </DialogContent>
+        <DialogActions>
+			<Button variant="outlined" onClick={()=> setOpen(false)}>Close</Button>
+			<Button color="success" variant="contained" type="submit">Save</Button>
+        </DialogActions>
+		</Box>
+      </Dialog>
+	  
+	  <Dialog
+        open={openedit}
+		onClose={()=> setOpenedit(false)}
+        TransitionComponent={Transition}
+        
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>Edit Data</DialogTitle>
+		<Box  component="form"   sx={{ mt: 1 }} onSubmit={EditData}>
 			<DialogContent dividers>
-					
-				<Grid container spacing={1}>
-				 
+
+				 <Grid container spacing={1}>
 				  <Grid item xs={12}>
-					<TextField margin="normal" required fullWidth size="small" value={detail.workplace}  onChange={ (e) => setDetail({ ...detail, workplace: e.target.value})}   name="workplace" id="workplace" label="Workplace Name"  />
+					<TextField margin="normal" required fullWidth size="small"  value={detail.id_depart}  onChange={ (e) => setDetail({ ...detail, id_depart: e.target.value})}   name="id_depart" id="id_depart" label="Code Department" autoComplete="id_depart" />
 				  </Grid>
 				  <Grid item xs={12}>
-					<TextField margin="normal" required fullWidth size="small" value={detail.address}  onChange={ (e) => setDetail({ ...detail, address: e.target.value})}   name="address" id="address" label="Address"  />
+					<TextField margin="normal" required fullWidth size="small"  value={detail.department} onChange={ (e) => setDetail({ ...detail, department: e.target.value})}  name="department" id="department" label="Department Name" autoComplete="department"/>
 				  </Grid>
 				</Grid>
 				
 			</DialogContent>
 			<DialogActions>
 				<Button variant="outlined" onClick={()=> setOpenedit(false)}>Close</Button>
-				<Button color="success" variant="contained" type="submit">Save</Button>
+				<Button color="success" variant="contained" type="submit" >Save</Button>
 			</DialogActions>
-			</Box>
-		  </Dialog>
-	   
-    </>
+		</Box>
+      </Dialog>
+	  
+	</>  
+    
   );
 }

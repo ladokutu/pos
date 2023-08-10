@@ -65,7 +65,52 @@ const Cart = (props) => {
 		setOpen(false)
 		setOpenPayment(true)
 	}
-	
+	const SimpanDataPayment = async (event) => {
+		event.preventDefault();
+		setLoading(true)
+		
+		try { 
+			const user_email= await localStorage.getItem('user_email')
+			const user_phone= await localStorage.getItem('user_phone')
+			const data_cart = {
+				"data_transaction": {
+					"user_email": user_email,
+					"user_phone": user_phone,
+					"id_payment": value,
+					"total_amount": result_sum,
+				},
+				"details": props.DataCarts
+			}
+			console.log(data_cart)
+            var api='https://node.ladokutu.info/index.php/Posc/add_data_transaction';  
+			const response = await axios({
+                  method: 'post',
+                  url: api,
+                  data: data_cart
+				});
+			console.log(response.data)
+			if (response.data.status === 200){
+				setOpenPayment(false)
+				props.RemDataCart()
+			}
+				//event.current.reset()
+				setAlerto({
+				  alerto: true,
+				  state_msg: response.data.message,
+				  state_typ:'success'
+				});
+			setLoading(false)
+        } catch (error) {
+			setAlerto({
+				  alerto: true,
+				  state_msg: 'Data Error',
+				  state_typ:'error'
+				});
+			setLoading(false)
+            console.log(error)
+        }
+
+	}
 	const SimpanDataPaymentPos = async (event) => {
 		event.preventDefault();
 		setLoading(true)
@@ -74,12 +119,12 @@ const Cart = (props) => {
 			const user_email= await localStorage.getItem('user_email')
 			const user_phone= await localStorage.getItem('user_phone')
 			const data_cart = {
-				"data_transaction": [{
+				"data_transaction": {
 					"user_email": user_email,
 					"user_phone": user_phone,
 					"id_payment": value,
 					"total_amount": result_sum,
-				}],
+				},
 				"details": props.DataCarts
 			}
 			console.log(data_cart)
@@ -226,7 +271,102 @@ const Cart = (props) => {
 				</DialogActions>
 				</Box>
 			  </Dialog>	
-			  	
+			  
+			  <Dialog
+				open={open_payment}
+				onClose={()=> setOpenPayment(false)}
+				TransitionComponent={Transition}
+				 maxWidth='md'
+				aria-describedby="alert-dialog-slide-description"
+			  >
+				<DialogTitle>Payment Method</DialogTitle>
+				<Box component="form" onSubmit={SimpanDataPaymentPos}  sx={{ mt: 1 }}>
+				<DialogContent dividers>
+						
+					<Grid container spacing={1}  >
+					  
+					  <Grid item xs={12} >
+						<Typography gutterBottom variant="h5" component="div" alignItems="center" justifyContent="center">
+							Total : {numberFormat(result_sum)}
+						</Typography>
+					  </Grid>
+					  <Grid item xs={12} >
+						<Box
+							  sx={{
+								justifyContent: 'center',  
+								display: 'flex',
+								flexWrap: 'wrap',
+								'& > :not(style)': {
+								  m: 1,
+								  width: 128,
+								  height: 128,
+								},
+							  }}
+						>  
+						  
+						  <Paper elevation={3} >
+							<Stack
+							  direction="column"
+							  justifyContent="space-between"
+							  alignItems="center"
+							  spacing={5}
+							>
+							  <Stack direction="row" spacing={2}>
+								<Radio checked={value === 'P-001'} onChange={handleChange} value="P-001"/>
+								<Avatar alt="QRIS" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd2k_3Z9T70C5YN1sKAJfySjO8Ck8p-3iCzg&usqp=CAU" sx={{ width: 56, height: 56 }} />
+							  </Stack>
+							  <Typography align="center">Cash</Typography>
+							</Stack>
+						  </Paper>
+						  
+						  <Paper elevation={3} >
+							<Stack
+							  direction="column"
+							  justifyContent="space-between"
+							  alignItems="center"
+							  spacing={5}
+							>
+							  <Stack direction="row" spacing={2}>
+								<Radio checked={value === 'P-002'} onChange={handleChange} value="P-002"/>
+								<Avatar alt="QRIS" src="https://storage.mysooltan.co.id/images/produk/sooltanpay/layanan%20qris.png" sx={{ width: 56, height: 56 }} />
+							  </Stack>
+							  
+							  <Typography align="center">QRIS</Typography>
+							 </Stack>
+						  </Paper>
+						 
+						  
+						  
+						  
+						   <Paper elevation={3} >
+							<Stack
+							  direction="column"
+							  justifyContent="space-between"
+							  alignItems="center"
+							  spacing={5}
+							>
+							  <Stack direction="row" spacing={2}>
+								<Radio checked={value === 'P-003'} onChange={handleChange} value="P-003"/>
+								<Avatar alt="QRIS" src="https://www.seekpng.com/png/detail/133-1339436_bank-wire-transfer-icon.png" sx={{ width: 56, height: 56 }} />
+							  </Stack>
+							  <Typography align="center">Bank Transfer</Typography>
+							</Stack>
+						  </Paper>
+						</Box>
+						
+						
+					  </Grid>
+					  
+					</Grid>
+					
+					
+				</DialogContent>
+				<DialogActions>
+					<Button variant="outlined" onClick={()=> setOpenPayment(false)}>Close</Button>
+					<Button color="success" variant="contained" type="submit">Submit</Button>
+				</DialogActions>
+				</Box>
+			</Dialog>	
 			<Dialog
 				open={open_payment_pos}
 				onClose={()=> setOpenPaymentPos(false)}
@@ -267,7 +407,7 @@ const Cart = (props) => {
 							>
 							  <Stack direction="row" spacing={2}>
 								<Radio checked={value === 'P-001'} onChange={handleChange} value="P-001"/>
-								<Avatar alt="Cash" src="https://node.ladokutu.info/include/images/cash.png" sx={{ width: 56, height: 56 }} />
+								<Avatar alt="QRIS" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd2k_3Z9T70C5YN1sKAJfySjO8Ck8p-3iCzg&usqp=CAU" sx={{ width: 56, height: 56 }} />
 							  </Stack>
 							  <Typography align="center">Cash</Typography>
 							</Stack>
@@ -283,7 +423,7 @@ const Cart = (props) => {
 							>
 							  <Stack direction="row" spacing={2}>
 								<Radio checked={value === 'P-002'} onChange={handleChange} value="P-002"/>
-								<Avatar alt="QRIS" src="https://node.ladokutu.info/include/images/qris.png" sx={{ width: 56, height: 56 }} />
+								<Avatar alt="QRIS" src="https://storage.mysooltan.co.id/images/produk/sooltanpay/layanan%20qris.png" sx={{ width: 56, height: 56 }} />
 							  </Stack>
 							  
 							  <Typography align="center">QRIS</Typography>
@@ -318,8 +458,11 @@ const Cart = (props) => {
 			  >
 				<DialogTitle>QR Payment </DialogTitle>
 				<Box component="form" onSubmit={SimpanDataPaymentPos}  sx={{ mt: 1 }}>
-				<DialogContent dividers>	
+				<DialogContent dividers>
+						
 					<Grid container spacing={1}  >
+					  
+					  
 					  <Grid item xs={12} >
 						<Box
 							  sx={{
@@ -335,8 +478,13 @@ const Cart = (props) => {
 						>  
 						<Avatar alt="QRIS" src={detail_qr} sx={{ width: 56, height: 56 }} variant="square" />
 						</Box>
+						
+						
 					  </Grid>
+					  
 					</Grid>
+					
+					
 				</DialogContent>
 				<DialogActions>
 					<Button variant="outlined" onClick={()=> setOpenQrPayment(false)}>Close</Button>

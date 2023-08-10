@@ -1,12 +1,12 @@
 import  React,{useEffect} from 'react';
-import { Home,Restore,ShoppingCartCheckout,ShoppingCart,Logout,LocalMall,Storefront,Store,Category,Inventory,LocationCity,Padding,Tune,PersonPinCircle,RunCircle,Reorder,PlaylistAddCheck,PlaylistAdd,MonetizationOn,PersonSearch,Person,Badge,ContactPage,Business,AccountBox,InsertInvitation,CalendarMonth,EventAvailable ,ExpandLess ,ExpandMore} from '@mui/icons-material';
+import { Home,ShoppingCartCheckout,ShoppingCart,Logout,LocalMall,Storefront,Store,Category,Inventory } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux';
 import {setDrawer} from '../../../Actions/getDataButton';
 import { Avatar,List,Box,Drawer,ListItemIcon,ListItemText,ListItemButton,ListItem,Divider   } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ModalTimeout from "./ModalTimeout";
-import { styled, alpha,makeStylesmakeStyles } from '@mui/material/styles';
+//import { styled, alpha,makeStylesmakeStyles } from '@mui/material/styles';
 
 
 const TemporaryDrawer = (props) => {
@@ -44,7 +44,7 @@ const TemporaryDrawer = (props) => {
 	  },
 	  { name: 'My Merchant', icon : <Storefront/> ,link: '#', id: 2 ,
 		child: [
-			{ name: 'Kategory', icon : <Category/> ,link: '/CategoryItem', id:21 },
+			{ name: 'Category', icon : <Category/> ,link: '/CategoryItems', id:21 },
 			{ name: 'Items ', icon : <Inventory/> ,link: '/Items', id:22 },
 			{ name: 'Profile ', icon : <Store/> ,link: '/Profile', id:23 },
 		]
@@ -63,7 +63,7 @@ const TemporaryDrawer = (props) => {
 		open[items.id]===true ? setOpen({ [items.id]: false }) : setOpen({ [items.id]: true })
 	}
 	
-	//console.log(logindata)
+	console.log(logindata)
 	
    const menu_sidebar=sidebar.map((items,index) =>{
 		

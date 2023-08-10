@@ -7,19 +7,16 @@ import { MoreVert ,Delete,Edit } from '@mui/icons-material';
 import {LinearProgress} from '@mui/material';
 import {Dialog,DialogActions,DialogTitle,DialogContent,Grid,Menu,MenuItem,IconButton,ListItemIcon,Divider,TextField} from '@mui/material';
 import Slide from '@mui/material/Slide';
-import moment from "moment";
 import Loader from '../../Tools/Loader';
 import Alerts from '../../Tools/Alerts';
-import { useLocation } from "react-router-dom";
-import {Select,InputLabel,FormControl} from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function DataTable() {
+
+export default function Items() {
   const [data, setData] = useState([]);
-  const newDate = moment(new Date()).format('YYYY-MM-DD')
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [openedit, setOpenedit] = useState(false)
@@ -29,17 +26,11 @@ export default function DataTable() {
   const openbol = Boolean(anchorEl);
   const [alerto, setAlerto] = useState('');
   const [detail, setDetail] = useState('');
-  const location = useLocation();
-  const [family, setDataFamily] = useState([]);
-  const [gender, setDataGender] = useState([]);
-  
   
   const columns = [
 	  { field: 'nomor', headerName: 'No', width: 50 },
-	  { field: 'name', headerName: 'Name', width: 350 },
-	  { field: 'birth_date', headerName: 'Birth Date', width: 200 },
-	  { field: 'gender', headerName: 'Gender', width: 200 },
-	  { field: 'status_family', headerName: 'Relation', width: 200 },
+	  { field: 'category_name', headerName: 'Type', width: 200 },
+	  { field: 'item_name', headerName: 'Name', width: 550 },
 	  { field: 'id', headerName: 'Action', width: 100,
 			renderCell: (cellValues) => {
 			  return (
@@ -84,10 +75,7 @@ export default function DataTable() {
 	};
 	
 	useEffect(() => {
-		//console.log('id :',location.state.id)
 		GetData()
-		GetDataFamily()
-		GetDataGender()
     },[]); 
 	const GetData = async () => {
 		try {
@@ -96,88 +84,37 @@ export default function DataTable() {
 			const headers_data = {
 				Authorization: tokendata,
 			}
-			var api='https://panen.ladokutu.info/index.php/Solution/data_user_family';  
+			var api='https://node.ladokutu.info/index.php/Posc/master_item_merchant_pos';  
 			const response = await axios({
 				method: 'post',
 				headers: headers_data,
 				url: api,
-				data: {id : location.state.id }
+				//withCredentials: true,
 			});
-			
+			//console.log(response)
 			setData(response.data)
 			setLoading(false)
 		} catch (e) {
 			console.log(e)
 		}
 	}
-	const GetDataFamily = async () => {
-		try {
-			setLoading(true)
-			const tokendata = await localStorage.getItem('TokenData')
-			const headers_data = {
-				Authorization: tokendata,
-			}
-			var api='https://panen.ladokutu.info/index.php/Solution/data_master_family';  
-			const response = await axios({
-				method: 'post',
-				headers: headers_data,
-				url: api,
-			});
-			
-			setDataFamily(response.data)
-			setLoading(false)
-		} catch (e) {
-			console.log(e)
-		}
-	}
-	const item_family=family.map((item,index) =>(
-		<MenuItem value={item.id_status_family}>{item.status_family}</MenuItem>
-	))
-	const GetDataGender = async () => {
-		try {
-			setLoading(true)
-			const tokendata = await localStorage.getItem('TokenData')
-			const headers_data = {
-				Authorization: tokendata,
-			}
-			var api='https://panen.ladokutu.info/index.php/Solution/data_master_gender';  
-			const response = await axios({
-				method: 'post',
-				headers: headers_data,
-				url: api,
-			});
-			//console.log(response.data)
-			setDataGender(response.data)
-			setLoading(false)
-		} catch (e) {
-			console.log(e)
-		}
-	}
-	const item_gender=gender.map((item,index) =>(
-		<MenuItem value={item.id_gender}>{item.gender}</MenuItem>
-	))
 	const SimpanData = async (event) => {
 		setLoading(true)
 		setOpen(false)
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		let name = data.get('name')
-		let birth_date = data.get('birth_date')
-		let id_status_family = data.get('id_status_family')
-		let id_gender = data.get('id_gender')
+		let department = data.get('department')
+		let id_depart = data.get('id_depart')
 
 		try { 
 			const tokendata = await localStorage.getItem('TokenData')
 				const headers_data = {
 					Authorization: tokendata,
 				}
-            var api='https://panen.ladokutu.info/index.php/Solution/add_data_user_family';  
+            var api='https://panen.ladokutu.info/index.php/Solution/add_data_master_category_item_merchant_pos';  
             const data_body = { 
-					'id_user':location.state.id,
-                    'name': name,
-					'birth_date': birth_date,
-					'id_status_family': id_status_family,
-					'id_gender': id_gender,
+                    'id_depart': id_depart,
+					'department': department,
 					
                 }
 			const response = await axios({
@@ -194,7 +131,7 @@ export default function DataTable() {
 				  state_msg: response.data.message,
 				  state_typ:'success'
 				});
-				//console.log(response.data.message)
+				console.log(response.data.message)
 			
 			setLoading(false)
         } catch (error) {
@@ -218,7 +155,7 @@ export default function DataTable() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-				var api='https://panen.ladokutu.info/index.php/Solution/delete_data_user_family';  
+				var api='https://panen.ladokutu.info/index.php/Solution/delete_data_master_category_item_merchant_pos';  
 				const response = await axios({
 					method: 'post',
 					headers: headers_data,
@@ -255,7 +192,7 @@ export default function DataTable() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-				var api='https://panen.ladokutu.info/index.php/Solution/view_data_user_family';  
+				var api='https://panen.ladokutu.info/index.php/Solution/view_data_master_category_item_merchant_pos';  
 				const response = await axios({
 					method: 'post',
 					headers: headers_data,
@@ -275,10 +212,8 @@ export default function DataTable() {
 	const EditData = async (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		let name = data.get('name')
-		let birth_date = data.get('birth_date')
-		let id_status_family = data.get('id_status_family')
-		let id_gender = data.get('id_gender')
+		let id_depart = data.get('id_depart')
+		let department = data.get('department')
 		
 		setOpenedit(false)
 		setLoading(true)
@@ -287,13 +222,11 @@ export default function DataTable() {
 				const headers_data = {
 					Authorization: tokendata,
 				}
-            var api='https://panen.ladokutu.info/index.php/Solution/edit_data_user_family';  
+            var api='https://panen.ladokutu.info/index.php/Solution/edit_data_master_category_item_merchant_pos';  
 			const data_body = { 
 					'id': value,
-                    'name': name,
-					'birth_date': birth_date,
-					'id_status_family': id_status_family,
-					'id_gender': id_gender,
+                    'id_depart': id_depart,
+					'department': department,
                 }
 			const response = await axios({
                   method: 'post',
@@ -362,44 +295,17 @@ export default function DataTable() {
         
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>Add Family</DialogTitle>
-		<Box component="form" onSubmit={SimpanData} noValidate >
+        <DialogTitle>Add Data</DialogTitle>
+		<Box component="form" onSubmit={SimpanData}  >
         <DialogContent dividers>
 				
 			
 			 <Grid container spacing={1}>
 			  <Grid item xs={12}>
-				<TextField margin="normal" required fullWidth size="small" name="name" id="name" label="Name" autoComplete="name" autoFocus />
+				<TextField margin="normal" required fullWidth size="small" name="id_depart" id="id_depart" label="Code Department" autoComplete="id_depart" autoFocus />
 			  </Grid>
-			  <Grid item xs={6}>
-					<TextField margin="normal" size="small" id="birth_date" name="birth_date" label="Birth Date" type="date" defaultValue={newDate} fullWidth />
-			  </Grid>
-			  
-			  <Grid item xs={6}>
-					<FormControl fullWidth margin="normal" size="small">
-					  <InputLabel id="demo-simple-select-label">Gender</InputLabel>
-					  <Select
-						labelId="demo-simple-select-label"
-						id="id_gender" name="id_gender"
-						label="Gender"
-					  >
-					  {item_gender}
-						
-					  </Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={6}>
-					<FormControl fullWidth margin="normal" size="small">
-					  <InputLabel id="demo-simple-select-label">Status Relation</InputLabel>
-					  <Select
-						labelId="demo-simple-select-label"
-						id="id_status_family" name="id_status_family"
-						label="Status Relation" 
-					  >
-						{item_family}
-						
-					  </Select>
-					</FormControl>
+			  <Grid item xs={12}>
+				<TextField margin="normal" required fullWidth size="small" name="department" id="department" label="Department Name" autoComplete="department" />
 			  </Grid>
 			</Grid>
 			
@@ -420,44 +326,17 @@ export default function DataTable() {
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle>Edit Data</DialogTitle>
-		<Box  component="form"  noValidate sx={{ mt: 1 }} onSubmit={EditData}>
+		<Box  component="form"   sx={{ mt: 1 }} onSubmit={EditData}>
 			<DialogContent dividers>
 
-				  <Grid container spacing={1}>
-			  <Grid item xs={12}>
-				<TextField margin="normal" required fullWidth size="small" value={detail.name}  onChange={ (e) => setDetail({ ...detail, name: e.target.value})} name="name" id="name" label="Name" autoComplete="name" autoFocus />
-			  </Grid>
-			  <Grid item xs={6}>
-					<TextField margin="normal" size="small" id="birth_date" value={detail.birth_date}  onChange={ (e) => setDetail({ ...detail, birth_date: e.target.value})} name="birth_date" label="Birth Date" type="date" defaultValue={newDate} fullWidth />
-			  </Grid>
-			  
-			  <Grid item xs={6}>
-					<FormControl fullWidth margin="normal" size="small">
-					  <InputLabel id="demo-simple-select-label">Gender</InputLabel>
-					  <Select
-						labelId="demo-simple-select-label"
-						id="id_gender" name="id_gender"
-						label="Gender" value={detail.id_gender}  onChange={ (e) => setDetail({ ...detail, id_gender: e.target.value})}
-					  >
-					  {item_gender}
-						
-					  </Select>
-					</FormControl>
+				 <Grid container spacing={1}>
+				  <Grid item xs={12}>
+					<TextField margin="normal" required fullWidth size="small"  value={detail.id_depart}  onChange={ (e) => setDetail({ ...detail, id_depart: e.target.value})}   name="id_depart" id="id_depart" label="Code Department" autoComplete="id_depart" />
+				  </Grid>
+				  <Grid item xs={12}>
+					<TextField margin="normal" required fullWidth size="small"  value={detail.department} onChange={ (e) => setDetail({ ...detail, department: e.target.value})}  name="department" id="department" label="Department Name" autoComplete="department"/>
+				  </Grid>
 				</Grid>
-				<Grid item xs={6}>
-					<FormControl fullWidth margin="normal" size="small">
-					  <InputLabel id="demo-simple-select-label">Status Relation</InputLabel>
-					  <Select
-						labelId="demo-simple-select-label"
-						id="id_status_family" name="id_status_family"
-						label="Status Relation" value={detail.id_status_family}  onChange={ (e) => setDetail({ ...detail, id_status_family: e.target.value})}
-					  >
-						{item_family}
-						
-					  </Select>
-					</FormControl>
-			  </Grid>
-			</Grid>
 				
 			</DialogContent>
 			<DialogActions>

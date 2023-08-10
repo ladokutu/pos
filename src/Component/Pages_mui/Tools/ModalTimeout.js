@@ -28,7 +28,7 @@ export default function ModalTimeout() {
 		
 		setOpen(true)
 		const timerId =  setTimeout(() => {
-		  navigate("/signout")
+		  navigate("/logout")
 		}, 1000 * 60);
 		setTimerID(timerId)
 	  }

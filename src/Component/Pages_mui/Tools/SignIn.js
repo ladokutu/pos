@@ -41,7 +41,7 @@ const SignIn = (props) => {
 		*/
 	
 		try { 
-            var api='https://node.tatamulia.co.id/index.php/Posc/login_data';  
+            var api='https://node.ladokutu.info/index.php/Posc/login_data';  
             const data = { 
                     'user_email': email,
 					'user_password': password
@@ -62,9 +62,11 @@ const SignIn = (props) => {
 				  state_typ:'success'
 				});
 				await localStorage.setItem('TokenData', response.data.token)
+				await localStorage.setItem('user_email', response.data.user_email)
+				await localStorage.setItem('user_phone', response.data.user_phone)
 				props.setDataLogin(response.data)
 				setLoading(false)
-				navigate("/")
+				navigate("/PosMerchant")
 			}else{
 				
 				setAlerto({

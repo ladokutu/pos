@@ -89,7 +89,7 @@ export default function DataTable() {
 				"user_email": user_email,
 				"user_phone": user_phone,
 			}
-			var api='https://node.tatamulia.co.id/index.php/Posc/data_recent_transaction';  
+			var api='https://node.ladokutu.info/index.php/Posc/data_recent_transaction';  
 			const response = await axios({
 				method: 'post',
 				data: data_body,
@@ -137,7 +137,7 @@ export default function DataTable() {
 			{data.map((item, index) => (
 			  <ListItem button key={index}>
 				<ListItemAvatar>
-				  <Avatar alt={item.status_name} src={item.status_name} />
+				  <Avatar alt={item.payment_name} src={item.payment_name} />
 				</ListItemAvatar>
 				<ListItemText primary={numberFormat(item.total_amount)+" "+item.payment_name} secondary={item.status_name} />
 				<ListSubheader >{item.createdate}</ListSubheader>

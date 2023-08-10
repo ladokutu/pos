@@ -10,7 +10,7 @@ export const useAuth =  () => {
 			const headers_data = {
 				Authorization: tokendata
 			}
-			var api='https://node.tatamulia.co.id/index.php/Posc/cek_token';  
+			var api='https://node.ladokutu.info/index.php/Posc/cek_token';  
 			const response = await axios({
 				method: 'post',
 				headers: headers_data,

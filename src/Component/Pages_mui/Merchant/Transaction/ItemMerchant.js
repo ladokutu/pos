@@ -82,7 +82,7 @@ const MerchantItem = (props) => {
 				Authorization: tokendata,
 				
 			}
-			var api='https://node.tatamulia.co.id/index.php/Posc/data_item_merchant_pos';  
+			var api='https://node.ladokutu.info/index.php/Posc/data_item_merchant_pos';  
 			const response = await axios({
 				method: 'post',
 				url: api,
@@ -99,7 +99,7 @@ const MerchantItem = (props) => {
 	const addshoopingcart = async (id_item,id_merchant) => {
 		try {
 			console.log('Add Item',id_item,id_merchant)
-			var api='https://node.tatamulia.co.id/index.php/Posc/data_detail_item_merchant';  
+			var api='https://node.ladokutu.info/index.php/Posc/data_detail_item_merchant';  
 			const response = await axios({
 				method: 'post',
 				url: api,

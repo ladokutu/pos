@@ -31,7 +31,7 @@ export default function DashboardMerchant() {
   const GetData = async () => {
 		try {
 			setLoading(true)
-			var api='https://node.tatamulia.co.id/index.php/Posc/data_merchant';  
+			var api='https://node.ladokutu.info/index.php/Posc/data_merchant';  
 			const response = await axios({
 				method: 'post',
 				url: api,
